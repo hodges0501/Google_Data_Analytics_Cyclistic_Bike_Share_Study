@@ -1,0 +1,88 @@
+---------- average ride_length by user----------
+
+SELECT member_casual, AVG(ride_length) AS avg_ride_length
+FROM `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`
+GROUP BY member_casual
+
+---------- average ride_length each month by user----------
+
+SELECT month, member_casual, AVG(ride_length) AS avg_ride_length
+FROM `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`
+GROUP BY month, member_casual
+ORDER BY month;
+
+---------- number of rides by user_type--------
+
+SELECT
+  member_casual AS Type_of_Rider,
+
+COUNT(ride_id) AS Total_Num_Of_Rides
+
+FROM `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`
+	
+GROUP BY
+	member_casual;
+
+----------calculate rides by user & bike type----------
+
+SELECT
+  member_casual AS type_of_rider,
+  rideable_type AS bike_type,
+
+COUNT(rideable_type) AS total_number_of_rides
+
+FROM
+  `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`
+
+GROUP BY
+  member_casual, rideable_type
+
+----------total number of rides by day of week--------
+
+SELECT day_of_week, member_casual, COUNT(day_of_week) AS total_rides
+FROM `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`
+GROUP BY day_of_week, member_casual;
+
+----------top 10 ending stations for casual users----------
+
+SELECT end_station_name, member_casual,
+  AVG(end_lat) AS end_lat, AVG(end_lng) AS end_lng,
+  COUNT(ride_id) AS total_trips
+FROM `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`
+WHERE member_casual = "casual"
+GROUP BY end_station_name, member_casual
+ORDER BY total_trips
+desc LIMIT 10;
+
+----------top 10 starting stations for casual users----------
+  
+SELECT start_station_name, member_casual,
+  AVG(start_lat) AS start_lat, AVG(start_lng) AS start_lng,
+  COUNT(ride_id) AS total_trips
+FROM `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`
+WHERE member_casual = "casual"
+GROUP BY start_station_name, member_casual
+ORDER BY total_trips
+desc LIMIT 10;
+
+------------top 10 starting stations for members----------
+
+SELECT start_station_name, member_casual,
+  AVG(start_lat) AS start_lat, AVG(start_lng) AS start_lng,
+  COUNT(ride_id) AS total_trips
+FROM `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`
+WHERE member_casual = "member"
+GROUP BY start_station_name, member_casual
+ORDER BY total_trips
+desc LIMIT 10;
+
+------------top 10 ending stations for members----------
+
+SELECT end_station_name, member_casual,
+  AVG(end_lat) AS end_lat, AVG(end_lng) AS end_lng,
+  COUNT(ride_id) AS total_trips
+FROM `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`
+WHERE member_casual = "member"
+GROUP BY end_station_name, member_casual
+ORDER BY total_trips
+desc LIMIT 10;
