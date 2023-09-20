@@ -1,0 +1,67 @@
+-- Data Cleaning
+-- step 1) create a new table
+-- step 2) create a row for day_of_week
+-- step 3) create a row for month
+-- step 4) create a row for ride_length
+-- step 5) remove all rows with null values in "start_station_name, end_station_name, end_lat, end_lng"
+-- step 6) remove all rows where 1 > ride_length > 1400 (numbers represent minutes)
+-- step 7) set ride_id as primary key
+-- step 8) calculate how many rows were removed from original 12_month_data table
+
+------------------------------CODE BEGINS AT LINE 13------------------------------------
+
+DROP TABLE IF EXISTS `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`;
+
+-- creating new table with clean data
+
+CREATE TABLE IF NOT EXISTS `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data` AS ( --(step 1)--
+  SELECT 
+    a.ride_id, rideable_type, started_at, ended_at, 
+    ride_length,
+    CASE EXTRACT(DAYOFWEEK FROM started_at) --(step 2)--
+      WHEN 1 THEN 'SUN'
+      WHEN 2 THEN 'MON'
+      WHEN 3 THEN 'TUES'
+      WHEN 4 THEN 'WED'
+      WHEN 5 THEN 'THURS'
+      WHEN 6 THEN 'FRI'
+      WHEN 7 THEN 'SAT'    
+    END AS day_of_week,
+    CASE EXTRACT(MONTH FROM started_at)  --(step3)--
+      WHEN 1 THEN 'JAN'
+      WHEN 2 THEN 'FEB'
+      WHEN 3 THEN 'MAR'
+      WHEN 4 THEN 'APR'
+      WHEN 5 THEN 'MAY'
+      WHEN 6 THEN 'JUN'
+      WHEN 7 THEN 'JUL'
+      WHEN 8 THEN 'AUG'
+      WHEN 9 THEN 'SEP'
+      WHEN 10 THEN 'OCT'
+      WHEN 11 THEN 'NOV'
+      WHEN 12 THEN 'DEC'
+    END AS month,
+    start_station_name, end_station_name, 
+    start_lat, start_lng, end_lat, end_lng, member_casual
+  FROM `capstone-project-1-398219.Cyclistic_rider_data.12_month_data` a
+  JOIN (
+    SELECT ride_id, (                                                       --(step 4)--
+      EXTRACT(HOUR FROM (ended_at - started_at)) * 60 +
+      EXTRACT(MINUTE FROM (ended_at - started_at)) +
+      EXTRACT(SECOND FROM (ended_at - started_at)) / 60) AS ride_length
+    FROM `capstone-project-1-398219.Cyclistic_rider_data.12_month_data`
+  ) b 
+  ON a.ride_id = b.ride_id
+  WHERE                                                                     --(step 5)--
+    start_station_name IS NOT NULL AND
+    end_station_name IS NOT NULL AND
+    end_lat IS NOT NULL AND
+    end_lng IS NOT NULL AND
+    ride_length > 1 AND ride_length < 1440                                  --(step 6)--
+);
+
+ALTER TABLE `capstone-project-1-398219.Cyclistic_rider_data.clean_12_month_data`     --(step 7)--
+ADD PRIMARY KEY(ride_id) NOT ENFORCED;
+
+SELECT COUNT(ride_id) AS no_of_rows       --(step 8)--
+FROM capstone-project-1-398219.Cyclistic_rider_data.clean_12_month
